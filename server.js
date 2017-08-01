@@ -363,7 +363,7 @@ async.series( {
       }
     });
     server.listen(PORT, function() {
-      log.info(REST, "REST Server initialized successfully");
+      log.info(REST, "REST Server initialized successfully at http://localhost:%d%s", PORT, CONTEXTROOT + ADMINURI);
       callbackMainSeries(null);
     });
   },
