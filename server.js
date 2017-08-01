@@ -262,7 +262,7 @@ async.series( {
         } else {
           log.info(PROCESS, "Starting interval for demozone %s", d.demozone);
           var i = setInterval(mainLoop, interval * 1000, d.demozone);
-          intervalLoop.push({ demozone: d.demozone, interval: i });
+          intervalLoop.push({ demozone: d.demozone, timer: interval, interval: i });
           d.status = ON;
           d.interval = i;
           log.info(PROCESS, "Setting loop for %d minutes", minutes);
@@ -392,7 +392,7 @@ async.series( {
     demozones.forEach((d) => {
       if (d.status === ON) {
         log.info(PROCESS, "Starting interval for demozone %s", d.demozone);
-        intervalLoop.push({ demozone: d.demozone, interval: setInterval(mainLoop, interval * 1000, d.demozone) });
+        intervalLoop.push({ demozone: d.demozone, timer: interval,, interval: setInterval(mainLoop, interval * 1000, d.demozone) });
       }
     });
   }
