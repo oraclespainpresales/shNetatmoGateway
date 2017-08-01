@@ -322,8 +322,8 @@ async.series( {
           var t = _.find(runTimer, ['demozone', d.demozone ]);
           if (t) {
             r.timer = {
-              r.startedAt = t.when;
-              r.period = t.minutes;
+              startedAt: t.when,
+              period: t.minutes
             }
           }
           result.push(r);
