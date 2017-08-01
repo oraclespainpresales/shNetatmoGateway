@@ -263,7 +263,7 @@ async.series( {
         res.status(200).end(JSON.stringify(result));
         return;
       }
-    };
+    });
     router.post(ADMINURI, function(req, res) {
       var op = req.params.op.toUpperCase();
       var demozone = req.params.demozone ? req.params.demozone.toUpperCase() : _.noop();
