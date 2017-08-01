@@ -1,0 +1,33 @@
+{
+  "name": "shnetatmogateway",
+  "version": "1.0.0",
+  "description": "Smart Hospitality: Gateway for Netatmo Thermostat",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oraclespainpresales/shNetatmoGateway.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oraclespainpresales/shNetatmoGateway/issues"
+  },
+  "homepage": "https://github.com/oraclespainpresales/shNetatmoGateway#readme",
+  "dependencies": {
+    "async": "^2.5.0",
+    "body-parser": "^1.17.2",
+    "command-line-args": "^4.0.6",
+    "command-line-usage": "^4.0.0",
+    "express": "^4.15.3",
+    "is-reachable": "^2.3.3",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "npmlog-ts": "0.0.1",
+    "request": "^2.81.0",
+    "restify-clients": "^1.5.0"
+  }
+}
