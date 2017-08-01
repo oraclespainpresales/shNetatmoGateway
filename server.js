@@ -313,8 +313,7 @@ async.series( {
           var t = _.find(intervalLoop, ['demozone', demozone ]);
           var r = {
             demozone: d.demozone,
-            status: d.status,
-            timer:
+            status: d.status
           };
           if (t) {
             r.timer = "RUNNING";
