@@ -236,6 +236,34 @@ async.series( {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(CONTEXTROOT, router);
+    router.get(ADMINURI, function(req, res) {
+      var op = req.params.op.toUpperCase();
+      if (op === OPSTATUS) {
+        var result = [];
+        demozones.forEach((d) => {
+          var r = {
+            demozone: d.demozone
+          };
+          r.loop =  {
+            status: d.status
+          };
+          var i = _.find(intervalLoop, ['demozone', d.demozone ]);
+          if (i) {
+            r.loop.interval = i.timer;
+          }
+          var t = _.find(runTimer, ['demozone', d.demozone ]);
+          if (t) {
+            r.timer = {
+              startedAt: t.when,
+              period: t.minutes
+            }
+          }
+          result.push(r);
+        });
+        res.status(200).end(JSON.stringify(result));
+        return;
+      }
+    };
     router.post(ADMINURI, function(req, res) {
       var op = req.params.op.toUpperCase();
       var demozone = req.params.demozone ? req.params.demozone.toUpperCase() : _.noop();
@@ -306,30 +334,6 @@ async.series( {
           _.remove(runTimer, { demozone: d.demozone });
           return;
         }
-      } else if (op === OPSTATUS) {
-        var result = [];
-        demozones.forEach((d) => {
-          var r = {
-            demozone: d.demozone
-          };
-          r.loop =  {
-            status: d.status
-          };
-          var i = _.find(intervalLoop, ['demozone', d.demozone ]);
-          if (i) {
-            r.loop.interval = i.timer;
-          }
-          var t = _.find(runTimer, ['demozone', d.demozone ]);
-          if (t) {
-            r.timer = {
-              startedAt: t.when,
-              period: t.minutes
-            }
-          }
-          result.push(r);
-        });
-        res.status(200).end(JSON.stringify(result));
-        return;
       } else if (op === OPIOTRESET) {
         shutdownIoTCS(() => {
           checkDeviceFiles(() => {
