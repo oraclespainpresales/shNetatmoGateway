@@ -310,14 +310,21 @@ async.series( {
         var result = [];
         demozones.forEach((d) => {
           var r = {
-            demozone: d.demozone,
+            demozone: d.demozone
+          };
+          r.loop =  {
             status: d.status
           };
+          var i = _.find(intervalLoop, ['demozone', d.demozone ]);
+          if (i) {
+            r.loop.interval = i.timer;
+          }
           var t = _.find(runTimer, ['demozone', d.demozone ]);
           if (t) {
-            r.timer = "RUNNING";
-            r.startedAt = t.when;
-            r.pediod = t.minutes;
+            r.timer = {
+              r.startedAt = t.when;
+              r.period = t.minutes;
+            }
           }
           result.push(r);
         });
@@ -366,7 +373,7 @@ async.series( {
         _.remove(intervalLoop, { demozone: d.demozone });
         d.status = OFF;
         d.interval = -1;
-        intervalLoop.push({ demozone: d.demozone, interval: setInterval(mainLoop, body.interval * 1000, d.demozone) });
+        intervalLoop.push({ demozone: d.demozone, timer: body.interval, interval: setInterval(mainLoop, body.interval * 1000, d.demozone) });
         d.status = ON;
         d.interval = body.interval;
         res.status(204).end();
