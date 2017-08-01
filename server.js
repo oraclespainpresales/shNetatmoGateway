@@ -307,8 +307,22 @@ async.series( {
           return;
         }
       } else if (op === OPSTATUS) {
-        // TODO
-        res.status(404).end();
+        var result = [];
+        demozones.forEach((d) => {
+          var t = _.find(runTimer, ['demozone', demozone ]);
+          var t = _.find(intervalLoop, ['demozone', demozone ]);
+          var r = {
+            demozone: d.demozone,
+            status: d.status,
+            timer:
+          };
+          if (t) {
+            r.timer = "RUNNING";
+            r.startedAt = t.when;
+          }
+          result.push(r);
+        });
+        res.status(200).end(result);
         return;
       } else if (op === OPIOTRESET) {
         shutdownIoTCS(() => {
