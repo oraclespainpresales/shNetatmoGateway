@@ -260,7 +260,7 @@ async.series( {
           }
           result.push(r);
         });
-        res.status(200).end(JSON.stringify(result));
+        res.status(200).send(JSON.stringify(result));
         return;
       }
     });
