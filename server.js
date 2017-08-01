@@ -321,7 +321,7 @@ async.series( {
           }
           result.push(r);
         });
-        res.status(200).end(result);
+        res.status(200).end(JSON.stringify(result));
         return;
       } else if (op === OPIOTRESET) {
         shutdownIoTCS(() => {
