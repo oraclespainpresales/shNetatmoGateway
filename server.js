@@ -261,7 +261,7 @@ async.series( {
           result.push(r);
         });
         res.set('Content-Type', 'application/json');
-        res.status(200).send(JSON.stringify(result));
+        res.status(200).end(JSON.stringify(result));
         return;
       }
     });
