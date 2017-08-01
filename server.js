@@ -267,7 +267,7 @@ async.series( {
           d.interval = i;
           log.info(PROCESS, "Setting loop for %d minutes", minutes);
           var timer = setTimeout(timerHandler, minutes * 60 * 1000, d.demozone, i);
-          runTimer.push({ demozone: d.demozone, when: new Date(), timer: timer });
+          runTimer.push({ demozone: d.demozone, when: new Date(), minutes: minutes, timer: timer });
           res.status(204).end();
           return;
         }
@@ -309,15 +309,15 @@ async.series( {
       } else if (op === OPSTATUS) {
         var result = [];
         demozones.forEach((d) => {
-          var t = _.find(runTimer, ['demozone', demozone ]);
-          var t = _.find(intervalLoop, ['demozone', demozone ]);
           var r = {
             demozone: d.demozone,
             status: d.status
           };
+          var t = _.find(runTimer, ['demozone', d.demozone ]);
           if (t) {
             r.timer = "RUNNING";
             r.startedAt = t.when;
+            r.pediod = t.minutes;
           }
           result.push(r);
         });
