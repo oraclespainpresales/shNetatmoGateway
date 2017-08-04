@@ -7,6 +7,7 @@ var async = require('async')
   , log = require('npmlog-ts')
   , util = require('util')
   , express = require('express')
+  , cors = require('cors')
   , restify = require('restify-clients')
   , http = require('http')
   , bodyParser = require('body-parser')
@@ -235,6 +236,7 @@ async.series( {
     log.info(REST, "Initializing REST Server");
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
+    app.use(cors());
     app.use(CONTEXTROOT, router);
     router.get(ADMINURI, function(req, res) {
       var op = req.params.op.toUpperCase();
