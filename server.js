@@ -44,7 +44,7 @@ const optionDefinitions = [
   { name: 'iothost', alias: 'h', type: String },
   { name: 'iotusername', alias: 'u', type: String },
   { name: 'iotpassword', alias: 'p', type: String },
-  { name: 'help', alias: 'h', type: Boolean },
+  { name: 'help', alias: '?', type: Boolean },
   { name: 'verbose', alias: 'v', type: Boolean, defaultOption: false }
 ];
 
@@ -98,7 +98,7 @@ const sections = [
       },
       {
         name: 'help',
-        alias: 'h',
+        alias: '?',
         description: 'Print this usage guide.'
       }
     ]
