@@ -263,7 +263,6 @@ async.series( {
       netatmoDevice.on('authenticated', () => {
         log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
         netatmo.push({ demozone: d.demozone, session: netatmoDevice, moduleid: d.moduleid, deviceid: d.deviceid });
-        c();
       });
       netatmoDevice.on('error', (err) => {
         log.error(NETATMO, "Error in Netatmo device for demozone %s: %s", d.demozone, err.message);
@@ -272,6 +271,7 @@ async.series( {
       netatmoDevice.on('warning', (warn) => {
         log.error(NETATMO, "Warning in Netatmo device for demozone %s: %s", d.demozone, warn.message);
       });
+      c();
     }, (err) => {
       callbackMainSeries(null);
     });
