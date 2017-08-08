@@ -386,13 +386,13 @@ async.series( {
           res.status(400).send("Demozone not specified");
           return;
         }
+        if (!param || isNaN(param) || param <= 0) {
+          res.status(400).end("Missing or invalid 'temperature' parameter");
+          return;
+        }
         var d = _.find(demozones, ['demozone', demozone ]);
         if (!d) {
           res.status(400).send("Demozone not registered");
-          return;
-        }
-        if (!req.body || !req.body.value) {
-          res.status(400).send("Missing or invalid payload");
           return;
         }
 
