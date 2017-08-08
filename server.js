@@ -381,7 +381,7 @@ async.series( {
           _.remove(runTimer, { demozone: d.demozone });
           return;
         }
-      } else if (op === OPSET) {
+      } else if (op === OPIOTSET) {
         if (!demozone) {
           res.status(400).send("Demozone not specified");
           return;
