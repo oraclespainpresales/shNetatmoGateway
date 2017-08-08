@@ -402,11 +402,11 @@ async.series( {
         }
 
         log.verbose(IOTCS, "Sending request to %s: %s", URI, JSON.stringify(data));
-
-        iotClient.post(URI, data, function(err, req, res, obj) {
-          if (err) {
-            log.error(IOTCS, err);
-            res.status(500).send(err.message);
+        iotClient.basicAuth(options.iotusername, options.iotpassword);
+        iotClient.post(URI, data, function(_err, _req, _res, obj) {
+          if (_err) {
+            log.error(IOTCS, _err);
+            _res.status(500).send(_err.message);
             return;
           }
           console.log(obj);
