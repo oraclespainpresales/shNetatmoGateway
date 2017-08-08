@@ -41,6 +41,9 @@ log.timestamp = true;
 const optionDefinitions = [
   { name: 'dbhost', alias: 'd', type: String },
   { name: 'interval', alias: 'i', type: Number },
+  { name: 'iothost', alias: 'h', type: String },
+  { name: 'iotusername', alias: 'u', type: String },
+  { name: 'iotpassword', alias: 'p', type: String },
   { name: 'help', alias: 'h', type: Boolean },
   { name: 'verbose', alias: 'v', type: Boolean, defaultOption: false }
 ];
@@ -55,7 +58,7 @@ const sections = [
     optionList: [
       {
         name: 'dbhost',
-        typeLabel: '[underline]{file}',
+        typeLabel: '[underline]{hostname/IP}',
         alias: 'd',
         type: String,
         description: 'DB Hostname for setup'
@@ -66,6 +69,27 @@ const sections = [
         alias: 'i',
         type: Number,
         description: 'Interval in seconds to retrieve info from Netatmo to IoTCS'
+      },
+      {
+        name: 'iothost',
+        typeLabel: '[underline]{hostname/IP}',
+        alias: 'h',
+        type: String,
+        description: 'IoTCS Hostname'
+      },
+      {
+        name: 'iotusername',
+        typeLabel: '[underline]{username}',
+        alias: 'u',
+        type: String,
+        description: 'IoTCS username'
+      },
+      {
+        name: 'iotpassword',
+        typeLabel: '[underline]{password}',
+        alias: 'p',
+        type: String,
+        description: 'IoTCS password'
       },
       {
         name: 'verbose',
@@ -90,24 +114,43 @@ try {
   process.exit(-1);
 }
 
+if (options.help) {
+  console.log(getUsage(sections));
+  process.exit(0);
+}
+
 if (!options.dbhost || !options.interval) {
   console.log(getUsage(sections));
   process.exit(-1);
 }
 
-if (options.help) {
+if (!options.dbhost || !options.interval) {
   console.log(getUsage(sections));
-  process.exit(0);
+  process.exit(-1);
+}
+
+if (!options.iothost || !options.iotusername || !options.iotpassword) {
+  console.log(getUsage(sections));
+  process.exit(-1);
 }
 
 var interval = options.interval;
 log.level = (options.verbose) ? 'verbose' : 'info';
 
 const SETUPURI = '/ords/pdb1/smarthospitality/netatmo/setup'
+    , IOTACTION = '/iot/api/v2/apps/%s/devices/%s/deviceModels/%s/actions/%s'
 ;
 
 var dbClient = restify.createJsonClient({
   url: 'https://' + options.dbhost,
+  rejectUnauthorized: false,
+  headers: {
+    "content-type": "application/json"
+  }
+});
+
+var iotClient = restify.createJsonClient({
+  url: 'https://' + options.iothost,
   rejectUnauthorized: false,
   headers: {
     "content-type": "application/json"
@@ -130,9 +173,10 @@ var netatmo = [];
 // Initializing REST & WS variables BEGIN
 const PORT = 11000
     , CONTEXTROOT = '/ngw'
-    , ADMINURI    = '/admin/:op/:demozone?/:minutes?'
+    , ADMINURI    = '/admin/:op/:demozone?/:param?'
     , OPSTART     = "START"
     , OPSTOP      = "STOP"
+    , OPIOTRESET  = "SET"
     , OPSTATUS    = "STATUS"
     , OPINTERVAL  = "INTERVAL"
     , OPIOTRESET  = "IOTRESET"
@@ -239,38 +283,38 @@ async.series( {
     app.use(cors());
     app.use(CONTEXTROOT, router);
     router.get(ADMINURI, function(req, res) {
-      var op = req.params.op.toUpperCase();
-      if (op === OPSTATUS) {
-        var result = [];
-        demozones.forEach((d) => {
-          var r = {
-            demozone: d.demozone
-          };
-          r.loop =  {
-            status: d.status
-          };
-          var i = _.find(intervalLoop, ['demozone', d.demozone ]);
-          if (i) {
-            r.loop.interval = i.timer;
-          }
-          var t = _.find(runTimer, ['demozone', d.demozone ]);
-          if (t) {
-            r.timer = {
-              startedAt: t.when,
-              period: t.minutes
-            }
-          }
-          result.push(r);
-        });
-        res.set('Content-Type', 'application/json');
-        res.status(200).end(JSON.stringify(result));
+      if (!req.params.op || req.params.op.toUpperCase() !== OPSTATUS) {
+        res.status(400).end();
         return;
       }
+      var result = [];
+      demozones.forEach((d) => {
+        var r = {
+          demozone: d.demozone
+        };
+        r.loop =  {
+          status: d.status
+        };
+        var i = _.find(intervalLoop, ['demozone', d.demozone ]);
+        if (i) {
+          r.loop.interval = i.timer;
+        }
+        var t = _.find(runTimer, ['demozone', d.demozone ]);
+        if (t) {
+          r.timer = {
+            startedAt: t.when,
+            period: t.minutes
+          }
+        }
+        result.push(r);
+      });
+      res.set('Content-Type', 'application/json');
+      res.status(200).json(JSON.stringify(result));
     });
     router.post(ADMINURI, function(req, res) {
       var op = req.params.op.toUpperCase();
       var demozone = req.params.demozone ? req.params.demozone.toUpperCase() : _.noop();
-      var minutes  = req.params.minutes ? Number(req.params.minutes) : _.noop();
+      var param  = req.params.param ? Number(req.params.param) : _.noop();
       var body = req.body;
       log.verbose(REST, "Received '%s' operation invoked with payload %j", op, body ? body : '<no payload>');
       if (op === OPSTART) {
@@ -278,7 +322,7 @@ async.series( {
           res.status(400).end("Demozone not specified");
           return;
         }
-        if (!minutes || isNaN(minutes) || minutes <= 0) {
+        if (!param || isNaN(param) || param <= 0) {
           res.status(400).end("Missing or invalid 'minutes' parameter");
           return;
         }
@@ -296,9 +340,9 @@ async.series( {
           intervalLoop.push({ demozone: d.demozone, timer: interval, interval: i });
           d.status = ON;
           d.interval = i;
-          log.info(PROCESS, "Setting loop for %d minutes", minutes);
-          var timer = setTimeout(timerHandler, minutes * 60 * 1000, d.demozone, i);
-          runTimer.push({ demozone: d.demozone, when: new Date(), minutes: minutes, timer: timer });
+          log.info(PROCESS, "Setting loop for %d minutes", param);
+          var timer = setTimeout(timerHandler, param * 60 * 1000, d.demozone, i);
+          runTimer.push({ demozone: d.demozone, when: new Date(), minutes: param, timer: timer });
           res.status(204).end();
           return;
         }
@@ -337,6 +381,45 @@ async.series( {
           _.remove(runTimer, { demozone: d.demozone });
           return;
         }
+      } else if (op === OPSET) {
+        if (!demozone) {
+          res.status(400).send("Demozone not specified");
+          return;
+        }
+        var d = _.find(demozones, ['demozone', demozone ]);
+        if (!d) {
+          res.status(400).send("Demozone not registered");
+          return;
+        }
+        if (!req.body || !req.body.value) {
+          res.status(400).send("Missing or invalid payload");
+          return;
+        }
+
+        console.log(d);
+
+        //'/iot/api/v2/apps/%s/devices/%s/deviceModels/%s/actions/%s'
+        //var URI = util.format(IOTACTION);
+/**
+        dbClient.get(SETUPURI, function(err, req, res, obj) {
+          var jBody = JSON.parse(res.body);
+          if (err) {
+            callbackMainSeries(err.message);
+          } else if (!jBody.items || jBody.items.length == 0) {
+            callbackMainSeries("No demozones found. Aborting.");
+          } else {
+            demozones = jBody.items;
+            log.info(PROCESS, "Demozones available:%s", _.reduce(demozones, (str, d) => {
+              return str + " " + d.demozone;
+            }, ""));
+            callbackMainSeries(null);
+          }
+        });
+**/
+        res.status(200).end();
+        return;
+
+
       } else if (op === OPIOTRESET) {
         shutdownIoTCS(() => {
           checkDeviceFiles(() => {
