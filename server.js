@@ -322,7 +322,7 @@ async.series( {
             period: t.minutes
           }
         }
-        var n = _.find(netatmo, ['demozone', demozone ]);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
         if (n) {
           r.netatmo = {
             status: n.status,
