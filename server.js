@@ -396,20 +396,6 @@ async.series( {
           return;
         }
 
-        { demozone: 'MADRID',
-          username: 'oracledemospain@gmail.com',
-          password: 'Welcome1#',
-          clientid: '56d42acbcce37c0282a728f9',
-          clientsecret: 'crSfkqoosaiO9im2iKjgcZJBrR',
-          deviceid: '70:ee:50:1a:d0:12',
-          moduleid: '04:00:00:1a:b1:7c',
-          iotappid: 'ED89E79C-F88F-4887-A078-5DF82D3BDBBD',
-          iotdeviceid: 'B1C25DF6-DFC0-4CC9-96DA-37FCBFF307B6',
-          ioturn: 'urn:com:oracle:iot:device:timg:vfsmarthospitality:thermostat',
-          iotactioncall: 'SetSetPointTemp',
-          status: 'OFF' }
-
-        //'/iot/api/v2/apps/%s/devices/%s/deviceModels/%s/actions/%s'
         var URI = util.format(IOTACTION, d.iotappid, d.iotdeviceid, d.ioturn, d.iotactioncall);
         var data = {
           value: d.deviceid + '/' + param
