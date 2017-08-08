@@ -308,8 +308,8 @@ async.series( {
         }
         result.push(r);
       });
-      res.set('Content-Type', 'application/json');
-      res.status(200).json(JSON.stringify(result));
+//      res.set('Content-Type', 'application/json');
+      res.status(200).json(result);
     });
     router.post(ADMINURI, function(req, res) {
       var op = req.params.op.toUpperCase();
