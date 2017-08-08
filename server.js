@@ -267,13 +267,13 @@ async.series( {
       var netatmoDevice = new netatmoapi(credentials);
       netatmoDevice.on('authenticated', () => {
         log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
-        var n = _.find(netatmo, ['demozone', demozone ]);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
         n.status = CONNECTED;
         n.session = netatmoDevice;
       });
       netatmoDevice.on('error', (err) => {
         log.error(NETATMO, "Error in Netatmo device for demozone %s: %s", d.demozone, err.message);
-        var n = _.find(netatmo, ['demozone', demozone ]);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
         n.status = ERROR;
         n.session = netatmoDevice;
         n.statusMessage = err.message;
@@ -281,7 +281,7 @@ async.series( {
       });
       netatmoDevice.on('warning', (warn) => {
         log.error(NETATMO, "Warning in Netatmo device for demozone %s: %s", d.demozone, warn.message);
-        var n = _.find(netatmo, ['demozone', demozone ]);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
         n.status = WARNING;
         n.session = netatmoDevice;
         n.statusMessage = warn.message;
