@@ -32,6 +32,10 @@ const PROCESSNAME = "Wedo Hospitality Demo - Netatmo Wrapper"
     , NETATMO = "NETATMO"
     , ON      = "ON"
     , OFF     = "OFF"
+    , CONNECTED    = "CONNECTED"
+    , DISCONNECTED = "DISCONNECTED"
+    , ERROR   = "ERROR"
+    , WARNING = "WARNING"
 ;
 
 log.timestamp = true;
