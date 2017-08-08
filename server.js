@@ -405,12 +405,12 @@ async.series( {
         iotClient.basicAuth(options.iotusername, options.iotpassword);
         iotClient.post(URI, data, function(_err, _req, _res, obj) {
           if (_err) {
-            log.error(IOTCS, _err);
+            log.error(IOTCS, _err.message);
             _res.status(500).send(_err.message);
             return;
           }
-          console.log(obj);
-          res.status(200).end();
+          log.verbose(IOTCS, "Request sent. Status: %s", obj.status);
+          res.status(200).json( { result: obj.status } );
           return;
         });
       } else if (op === OPIOTRESET) {
