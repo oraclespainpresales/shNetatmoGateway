@@ -403,7 +403,7 @@ async.series( {
 
         log.verbose(IOTCS, "Sending request to %s: %s", URI, JSON.stringify(data));
 
-        iotClient.post(SETUPURI, data, function(err, req, res, obj) {
+        iotClient.post(URI, data, function(err, req, res, obj) {
           if (err) {
             log.error(IOTCS, err);
             res.status(500).send(err.message);
