@@ -259,17 +259,29 @@ async.series( {
         username: d.username,
         password: d.password
       };
+      netatmo.push({ demozone: d.demozone, status: DISCONNECTED, statusMessage: _.noop(), session: _.noop(), moduleid: d.moduleid, deviceid: d.deviceid });
       var netatmoDevice = new netatmoapi(credentials);
       netatmoDevice.on('authenticated', () => {
         log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
-        netatmo.push({ demozone: d.demozone, session: netatmoDevice, moduleid: d.moduleid, deviceid: d.deviceid });
+        var n = _.find(netatmo, ['demozone', demozone ]);
+        n.status = CONNECTED;
+        n.session = netatmoDevice;
       });
       netatmoDevice.on('error', (err) => {
         log.error(NETATMO, "Error in Netatmo device for demozone %s: %s", d.demozone, err.message);
+        var n = _.find(netatmo, ['demozone', demozone ]);
+        n.status = ERROR;
+        n.session = netatmoDevice;
+        n.statusMessage = err.message;
         return;
       });
       netatmoDevice.on('warning', (warn) => {
         log.error(NETATMO, "Warning in Netatmo device for demozone %s: %s", d.demozone, warn.message);
+        var n = _.find(netatmo, ['demozone', demozone ]);
+        n.status = WARNING;
+        n.session = netatmoDevice;
+        n.statusMessage = warn.message;
+        return;
       });
       c();
     }, (err) => {
@@ -306,9 +318,15 @@ async.series( {
             period: t.minutes
           }
         }
+        var n = _.find(netatmo, ['demozone', demozone ]);
+        if (n) {
+          r.netatmo = {
+            status: n.status,
+            message: n.statusMessage
+          }
+        }
         result.push(r);
       });
-//      res.set('Content-Type', 'application/json');
       res.status(200).json(result);
     });
     router.post(ADMINURI, function(req, res) {
