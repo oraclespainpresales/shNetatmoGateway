@@ -142,6 +142,7 @@ var interval = options.interval;
 log.level = (options.verbose) ? 'verbose' : 'info';
 
 const SETUPURI = '/ords/pdb1/smarthospitality/netatmo/setup'
+    , UPDATETARGETTEMP = '/ords/pdb1/smarthospitality/netatmo/target/set/%s/%s'
     , IOTACTION = '/iot/api/v2/apps/%s/devices/%s/deviceModels/%s/actions/%s'
 ;
 
@@ -699,6 +700,12 @@ function setTemperature(value) {
         log.error(NETATMO, err.message);
         return;
       }
+      var URI = util.format(UPDATETARGETTEMP, n.demozone, targetTemp);
+      dbClient.post(UPDATETARGETTEMP, function(err, req, res, obj) {
+        if (err) {
+          log.error(PROCESS, err.message);
+        }
+      });
     });
   });
 }
