@@ -701,8 +701,10 @@ function setTemperature(value) {
         return;
       }
       var URI = util.format(UPDATETARGETTEMP, n.demozone, targetTemp);
+      log.verbose(PROCESS, UPDATETARGETTEMP);
       dbClient.post(UPDATETARGETTEMP, function(err, req, res, obj) {
         if (err) {
+          console.log(err);
           log.error(PROCESS, err.message);
         }
       });
