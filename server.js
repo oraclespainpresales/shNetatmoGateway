@@ -695,11 +695,13 @@ function setTemperature(value) {
       setpoint_temp: targetTemp,
       setpoint_endtime: moment().add(30, 'minutes').unix() // by default we set 30 minutes for duration of the manual mode
     };
+    log.verbose(NETATMO, "Setting thermpoint with options: " + JSON.stringify(options));
     n.session.setThermpoint(options, function(err, response) {
       if (err) {
         log.error(NETATMO, err.message);
         return;
       }
+      log.verbose(NETATMO, "Response: " + JSON.stringify(response));
       var URI = util.format(UPDATETARGETTEMP, n.demozone, targetTemp);
       dbClient.post(URI, function(err, req, res, obj) {
         if (err) {
