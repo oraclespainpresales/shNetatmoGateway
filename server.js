@@ -511,6 +511,7 @@ function checkDeviceFiles(callback) {
       log.verbose(PROCESS, "Enabling demozone %s", d.demozone);
     } else {
       log.error(PROCESS, "Demozone %s does not have IoTCS configuration file available (%s). Ignoring.", d.demozone, filename);
+      d.demozone = "__" + d.demozone; // mark it as invalid
     }
     c();
   }, (err) => {
@@ -529,37 +530,41 @@ function shutdownNetatmo(callback) {
 
 function initializeNetatmo(callback) {
   async.eachSeries(demozones, (d, c) => {
-    log.info(NETATMO, "Enabling Netatmo device for demozone %s", d.demozone);
-    var credentials = {
-      client_id: d.clientid,
-      client_secret: d.clientsecret,
-      username: d.username,
-      password: d.password
-    };
-    netatmo.push({ demozone: d.demozone, status: DISCONNECTED, statusMessage: _.noop(), session: _.noop(), moduleid: d.moduleid, deviceid: d.deviceid });
-    var netatmoDevice = new netatmoapi(credentials);
-    netatmoDevice.on('authenticated', () => {
-      log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
-      var n = _.find(netatmo, ['demozone', d.demozone ]);
-      n.status = CONNECTED;
-      n.session = netatmoDevice;
-    });
-    netatmoDevice.on('error', (err) => {
-      log.error(NETATMO, "Error in Netatmo device for demozone %s: %s", d.demozone, err.message);
-      var n = _.find(netatmo, ['demozone', d.demozone ]);
-      n.status = ERROR;
-      n.session = netatmoDevice;
-      n.statusMessage = err.message;
-      return;
-    });
-    netatmoDevice.on('warning', (warn) => {
-      log.error(NETATMO, "Warning in Netatmo device for demozone %s: %s", d.demozone, warn.message);
-      var n = _.find(netatmo, ['demozone', d.demozone ]);
-      n.status = WARNING;
-      n.session = netatmoDevice;
-      n.statusMessage = warn.message;
-      return;
-    });
+    if ( d.demozone.startsWith("__")) {
+      log.verbose(NETATMO, "Ignoring invalid demozone %s", d.demozone.substring(2));
+    } else {
+      log.info(NETATMO, "Enabling Netatmo device for demozone %s", d.demozone);
+      var credentials = {
+        client_id: d.clientid,
+        client_secret: d.clientsecret,
+        username: d.username,
+        password: d.password
+      };
+      netatmo.push({ demozone: d.demozone, status: DISCONNECTED, statusMessage: _.noop(), session: _.noop(), moduleid: d.moduleid, deviceid: d.deviceid });
+      var netatmoDevice = new netatmoapi(credentials);
+      netatmoDevice.on('authenticated', () => {
+        log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
+        n.status = CONNECTED;
+        n.session = netatmoDevice;
+      });
+      netatmoDevice.on('error', (err) => {
+        log.error(NETATMO, "Error in Netatmo device for demozone %s: %s", d.demozone, err.message);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
+        n.status = ERROR;
+        n.session = netatmoDevice;
+        n.statusMessage = err.message;
+        return;
+      });
+      netatmoDevice.on('warning', (warn) => {
+        log.error(NETATMO, "Warning in Netatmo device for demozone %s: %s", d.demozone, warn.message);
+        var n = _.find(netatmo, ['demozone', d.demozone ]);
+        n.status = WARNING;
+        n.session = netatmoDevice;
+        n.statusMessage = warn.message;
+        return;
+      });
+    }
     c();
   }, (err) => {
     callback(null);
