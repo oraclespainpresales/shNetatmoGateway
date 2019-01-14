@@ -146,8 +146,6 @@ const SETUPURI = '/ords/pdb1/smarthospitality/netatmo/setup'
     , IOTACTION = '/iot/api/v2/apps/%s/devices/%s/deviceModels/%s/actions/%s'
 ;
 
-log.verbose(PROCESS, "Creating IoT connection to server %s", 'https://' + options.dbhost);
-
 var dbClient = restify.createJsonClient({
   url: 'https://' + options.dbhost,
   rejectUnauthorized: false,
@@ -234,6 +232,10 @@ async.series( {
   splash: function(callbackMainSeries) {
     log.info(PROCESS, "%s - %s", PROCESSNAME, VERSION);
     log.info(PROCESS, "Author - %s", AUTHOR);
+    callbackMainSeries(null);
+  },
+  iotsetup: function(callbackMainSeries) {
+    log.verbose(PROCESS, "Creating IoT connection to server %s", 'https://' + options.iothost);
     callbackMainSeries(null);
   },
   dbSetup: function(callbackMainSeries) {
