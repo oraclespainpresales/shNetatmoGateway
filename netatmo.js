@@ -120,7 +120,8 @@ netatmo.prototype.authenticate = function (args, callback) {
     this.MYACCESS_TOKEN = body.access_token;
 
     if (body.expires_in) {
-      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
+//      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
+      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, form);
     }
 
     this.emit('authenticated');
@@ -140,14 +141,16 @@ netatmo.prototype.authenticate = function (args, callback) {
  * @param refresh_token
  * @returns {netatmo}
  */
-netatmo.prototype.authenticate_refresh = function (refresh_token) {
+netatmo.prototype.authenticate_refresh = function (form) {
 
+/**
   var form = {
     grant_type: 'refresh_token',
     refresh_token: refresh_token,
     client_id: client_id,
     client_secret: client_secret,
   };
+**/
 
   var url = util.format('%s/oauth2/token', BASE_URL);
 
@@ -166,7 +169,8 @@ netatmo.prototype.authenticate_refresh = function (refresh_token) {
     this.MYACCESS_TOKEN = body.access_token;
 
     if (body.expires_in) {
-      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
+//      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
+      setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, form);
     }
 
     return this;
