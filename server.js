@@ -550,8 +550,6 @@ function initializeNetatmo(callback) {
         log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
         var n = _.find(netatmo, ['demozone', d.demozone ]);
         n.status = CONNECTED;
-        console.log("netatmoDevice:");
-        console.log(netatmoDevice);
         n.session = netatmoDevice;
       });
       netatmoDevice.on('error', (err) => {
