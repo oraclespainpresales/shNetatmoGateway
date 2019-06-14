@@ -117,7 +117,7 @@ netatmo.prototype.authenticate = function (args, callback) {
     body = JSON.parse(body);
 
     access_token = body.access_token;
-    MYACCESS_TOKEN = body.access_token;
+    this.MYACCESS_TOKEN = body.access_token;
 
     if (body.expires_in) {
       setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
