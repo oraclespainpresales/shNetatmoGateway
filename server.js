@@ -552,8 +552,6 @@ function initializeNetatmo(callback) {
         n.status = CONNECTED;
         console.log("netatmoDevice:");
         console.log(netatmoDevice);
-        console.log("this:");
-        console.log(this);
         n.session = netatmoDevice;
       });
       netatmoDevice.on('error', (err) => {
