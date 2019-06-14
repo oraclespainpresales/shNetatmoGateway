@@ -545,11 +545,15 @@ function initializeNetatmo(callback) {
         password: d.password
       };
       netatmo.push({ demozone: d.demozone, status: DISCONNECTED, statusMessage: _.noop(), session: _.noop(), moduleid: d.moduleid, deviceid: d.deviceid });
-      var netatmoDevice = new netatmoapi(credentials);
+      var netatmoDevice = new netatmoapi(credentials, d.demozone);
       netatmoDevice.on('authenticated', () => {
         log.info(NETATMO, "Netatmo device for demozone %s, successfully authenticated", d.demozone);
         var n = _.find(netatmo, ['demozone', d.demozone ]);
         n.status = CONNECTED;
+        console.log("netatmoDevice:");
+        console.log(netatmoDevice);
+        console.log("this:");
+        console.log(this);
         n.session = netatmoDevice;
       });
       netatmoDevice.on('error', (err) => {
@@ -697,7 +701,6 @@ function setTemperature(value) {
   var net = _.filter(netatmo, ['deviceid', deviceId ]);
   net.forEach((n) => {
     log.verbose(IOTCS, "Matching device in demozone %s, module: %s, device: %s", n.demozone, n.moduleid, n.deviceid);
-//    console.log(n);
     var options = {
       device_id: n.deviceid,
       module_id: n.moduleid,
