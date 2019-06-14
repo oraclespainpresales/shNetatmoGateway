@@ -115,6 +115,8 @@ netatmo.prototype.authenticate = function (args, callback) {
 
     access_token = body.access_token;
 
+    console.log("Authenticated: " + access_token);
+
     if (body.expires_in) {
       setTimeout(this.authenticate_refresh.bind(this), body.expires_in * 1000, body.refresh_token);
     }
@@ -642,6 +644,9 @@ netatmo.prototype.setSyncSchedule = function (options, callback) {
  */
 netatmo.prototype.setThermpoint = function (options, callback) {
   // Wait until authenticated.
+
+  console.log(access_token);
+
   if (!access_token) {
     return this.on('authenticated', function () {
       this.setThermpoint(options, callback);

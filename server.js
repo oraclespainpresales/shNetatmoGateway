@@ -697,7 +697,7 @@ function setTemperature(value) {
   var net = _.filter(netatmo, ['deviceid', deviceId ]);
   net.forEach((n) => {
     log.verbose(IOTCS, "Matching device in demozone %s, module: %s, device: %s", n.demozone, n.moduleid, n.deviceid);
-    console.log(n);
+//    console.log(n);
     var options = {
       device_id: n.deviceid,
       module_id: n.moduleid,
