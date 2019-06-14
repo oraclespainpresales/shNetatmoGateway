@@ -647,7 +647,9 @@ netatmo.prototype.setSyncSchedule = function (options, callback) {
 netatmo.prototype.setThermpoint = function (options, callback) {
   // Wait until authenticated.
 
-  if (!access_token) {
+
+//  if (!access_token) {
+  if (!this.MYACCESS_TOKEN) {
     return this.on('authenticated', function () {
       this.setThermpoint(options, callback);
     });
@@ -676,7 +678,8 @@ netatmo.prototype.setThermpoint = function (options, callback) {
   var url = util.format('%s/api/setthermpoint', BASE_URL);
 
   var form = {
-    access_token: access_token,
+//    access_token: access_token,
+    access_token: this.MYACCESS_TOKEN,
     device_id: options.device_id,
     module_id: options.module_id,
     setpoint_mode: options.setpoint_mode,
